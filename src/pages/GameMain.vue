@@ -8,8 +8,11 @@ import { BattleScene } from '../game/scene/battleScene'
 import { player, enemy } from '../game/character/character'
 import { cmdwindow } from 'src/game/UIComponents/cmdwindow'
 import { LOGICAL_WIDTH, LOGICAL_HEIGHT } from 'src/game/core/constants'
+import { KeyActionMap } from 'src/game/core/keymap'
+import { useRouter} from 'vue-router' 
 
 const canvas = ref<HTMLCanvasElement | null>(null)
+const router = useRouter()
 
 let ctx: CanvasRenderingContext2D
 let scene: BattleScene
@@ -86,7 +89,15 @@ onBeforeUnmount(() => {
 })
 
 function onKeyDown(e: KeyboardEvent) {
-  scene.handleInput(e.key)
+  if (e.repeat) return
+  const action = KeyActionMap[e.key]
+  if (!action) return
+
+  scene.handleInput(action)
+
+  scene.showEscapeConfirm = () => {
+    void router.push('/')
+  }
 }
 
 </script>

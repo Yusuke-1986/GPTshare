@@ -1,5 +1,6 @@
 import { CreateObject } from '../core/objectModels'
 import type { Vec2 } from '../core/types'
+import type { BattleCommand } from '../core/types'
 
 export class Commands extends CreateObject {
   constructor(
@@ -28,6 +29,7 @@ export class Commands extends CreateObject {
 export class CommandWindow extends CreateObject {
   commands: Commands[]
   selectedIndex = 0
+  onRequestEscape?: () => void
 
   constructor(
     position: Vec2,
@@ -37,35 +39,35 @@ export class CommandWindow extends CreateObject {
   ) {
     super(position, size, image)
     this.commands = commands
+
     // this.position.x = 550
     // this.position.y = 250
 }
 
-  handleInput(key: string) {
+  handleInput(action: BattleCommand) {
     if (!this.visible) return
 
-    switch (key) {
-      case 'ArrowUp':
-        this.selectedIndex--
+    switch (action) {
+      case 'Escape':
+        console.log(action)
+        this.onEscape()
         break
-      case 'ArrowDown':
+        
+      case 'Attack':
+        console.log(action)
         this.selectedIndex++
         break
-      case 'Enter':
-        this.onSelect()
-        break
     }
-
-    // 範囲制御（ここ大事）
-    const max = this.commands.length - 1
-    if (this.selectedIndex < 0) this.selectedIndex = max
-    if (this.selectedIndex > max) this.selectedIndex = 0
   }
 
   onSelect() {
     const command = this.commands[this.selectedIndex]
     console.log('SELECT:', command)
     // → BattleScene に通知してもOK
+  }
+
+  onEscape(){
+    this.onRequestEscape?.()
   }
 
   override draw(ctx: CanvasRenderingContext2D) {

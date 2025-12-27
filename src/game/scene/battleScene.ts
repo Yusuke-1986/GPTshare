@@ -1,17 +1,39 @@
 import type { createCharacter } from "../character/characterModel";
-import { CommandWindow } from "../core/command";
+import type { CommandWindow } from "../core/command";
 import { LOGICAL_WIDTH, LOGICAL_HEIGHT } from "../core/constants";
+import type { BattleCommand, BattleState } from "../core/types";
+import { EscapeConfirmWindow } from "../UIComponents/confirmwindow";
 
 export class BattleScene {
   private characters: createCharacter[] = []
   private window: CommandWindow
   private bgVideo: HTMLVideoElement
   private camera = new Camera()
+  private mode: BattleState = "command"
+  EscapeConfirmWindow: EscapeConfirmWindow
 
   constructor(characters: createCharacter[], window: CommandWindow, bgVideo: HTMLVideoElement) {
     this.characters = characters
     this.window = window
     this.bgVideo = bgVideo
+
+    this.window.onRequestEscape = () => {
+      this.showEscapeConfirm()
+    }
+
+    this.EscapeConfirmWindow = new EscapeConfirmWindow(
+      {x:0 , y: 0},
+      {x: 100, y: 100},
+      undefined
+    )
+
+    this.EscapeConfirmWindow.onConfirm = (yes) => {
+      if (yes) {
+        this.showEscapeConfirm?.()
+      } else {
+        this.closeEscapeConfirm()
+      }
+    }
   }
 
   update(dt: number) {
@@ -20,8 +42,26 @@ export class BattleScene {
     }
   }
 
-  handleInput(key: string) {
-    this.window.handleInput(key)
+  handleInput(action: BattleCommand) {
+    if (this.mode === 'command') {
+      this.window.handleInput(action)
+      return
+    }
+  }
+  handleEscape(action: BattleCommand){
+    if (this.mode === 'escape') {
+      this.EscapeConfirmWindow.handleInput(action)
+    }
+  }
+
+  showEscapeConfirm() {
+    this.mode = 'escape'
+    this.EscapeConfirmWindow.visible = true
+  }
+
+  closeEscapeConfirm() {
+    this.mode = 'command'
+    this.EscapeConfirmWindow.visible = false
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -47,6 +87,7 @@ export class BattleScene {
     ctx.restore()
 
     this.window.draw(ctx)
+    this.EscapeConfirmWindow.draw(ctx)
   }
 }
 

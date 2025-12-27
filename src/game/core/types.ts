@@ -1,11 +1,12 @@
 // src/game/core/types.ts
-export type BattleState = 'command' | 'animating' | 'end'
+export type BattleState = 'command' | 'escape' | 'animating' | 'end'
 
 export type BattleCommand =
   | 'Attack'
   | 'Magic'
   | 'Special'
   | 'Item'
+  | 'Escape'
 
 export type DamageResult = {
   damage: number
@@ -21,5 +22,6 @@ export type BattleEvent =
   | { type: 'wait' ; result: WaitTime }
   | { type: 'EnemyAttack'; result: DamageResult }
   | { type: 'BattleEnd'; winner: 'player' | 'enemy' }
+  | { type: 'Escape'; result: ""}
 
 export type Vec2 = { x: number; y: number }
