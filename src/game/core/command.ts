@@ -44,12 +44,11 @@ export class CommandWindow extends CreateObject {
     // this.position.y = 250
 }
 
-  handleInput(action: BattleCommand) {
+  handleInput(action: string) {
     if (!this.visible) return
 
     switch (action) {
       case 'Escape':
-        console.log(action)
         this.onEscape()
         break
         

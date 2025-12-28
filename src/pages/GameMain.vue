@@ -16,6 +16,7 @@ const router = useRouter()
 
 let ctx: CanvasRenderingContext2D
 let scene: BattleScene
+let rafId = 0
 
 const bgVideo = document.createElement('video')
 bgVideo.src = '/videos/battle-bg.mp4'
@@ -24,7 +25,7 @@ bgVideo.muted = true   // 自動再生のため必須
 bgVideo.playsInline = true
 bgVideo.autoplay = true
 
-bgVideo.play()
+
 
 /* ===== resize処理 ===== */
 function resize() {
@@ -60,22 +61,36 @@ function resize() {
     LOGICAL_WIDTH / 2,
     LOGICAL_HEIGHT / 2
   )
-  
 }
 
 /* ===== 描画ループ（描画のみ） ===== */
 function render() {
   ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT)
   scene.draw(ctx)
-  requestAnimationFrame(render)
+  rafId = requestAnimationFrame(render)
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('keydown', onKeyDown)
   ctx = canvas.value!.getContext('2d')!
+  try {
+    await bgVideo.play()
+  } catch {
+    //
+  }
+  
 
   // Scene生成（計算は別で回っている想定）
-  scene = new BattleScene([player, enemy], cmdwindow, bgVideo)
+  scene = new BattleScene(
+    [player, enemy], 
+    cmdwindow, 
+    bgVideo, 
+    {
+      onEscapeConfirmed: () => {
+        void router.push('/')
+      }
+    }
+  )
 
   resize()
   window.addEventListener('resize', resize)
@@ -84,20 +99,16 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', resize)
-  window.removeEventListener('keydown', onKeyDown)
+  cancelAnimationFrame(rafId)
 })
 
 function onKeyDown(e: KeyboardEvent) {
   if (e.repeat) return
   const action = KeyActionMap[e.key]
+  // console.log(action, e.key)
   if (!action) return
-
+  
   scene.handleInput(action)
-
-  scene.showEscapeConfirm = () => {
-    void router.push('/')
-  }
 }
 
 </script>

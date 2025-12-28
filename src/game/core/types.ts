@@ -25,3 +25,4 @@ export type BattleEvent =
   | { type: 'Escape'; result: ""}
 
 export type Vec2 = { x: number; y: number }
+

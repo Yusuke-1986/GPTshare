@@ -7,20 +7,21 @@ export class EscapeConfirmWindow extends CreateObject {
   onConfirm?: (yes: boolean) => void
 
   handleInput(key: string) {
-    if (!this.visible) return
+    // this.visible = true
+    console.log(key)
 
-    if (key === 'ArrowLeft' || key === 'ArrowUp') {
+    if (key === 'left' || key === 'up') {
       this.selectedIndex = 0
     }
-    if (key === 'ArrowRight' || key === 'ArrowDown') {
+    if (key === 'right' || key === 'down') {
       this.selectedIndex = 1
     }
 
-    if (key === 'Enter') {
+    if (key === 'enter') {
       this.onConfirm?.(this.selectedIndex === 0)
     }
 
-    if (key === 'Escape') {
+    if (key === 'escape') {
       this.onConfirm?.(false)
     }
   }

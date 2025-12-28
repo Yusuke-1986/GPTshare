@@ -1,8 +1,10 @@
 // core/keymap.ts
-import type { BattleCommand } from './types'
 
-export const KeyActionMap: Record<string, BattleCommand | undefined> = {
-  a: 'Attack',
-  A: 'Attack',
-  Escape: 'Escape',
+export const KeyActionMap: Record<string, string | undefined> = {
+  ArrowUp: 'up',
+  ArrowDown: 'down',
+  ArrowLeft: 'left',
+  ArrowRight: 'right',
+  Enter: 'confirm',
+  Escape: 'escape',
 }

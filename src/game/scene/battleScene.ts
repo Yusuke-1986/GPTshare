@@ -1,7 +1,7 @@
 import type { createCharacter } from "../character/characterModel";
 import type { CommandWindow } from "../core/command";
 import { LOGICAL_WIDTH, LOGICAL_HEIGHT } from "../core/constants";
-import type { BattleCommand, BattleState } from "../core/types";
+import type { BattleState } from "../core/types";
 import { EscapeConfirmWindow } from "../UIComponents/confirmwindow";
 
 export class BattleScene {
@@ -10,26 +10,31 @@ export class BattleScene {
   private bgVideo: HTMLVideoElement
   private camera = new Camera()
   private mode: BattleState = "command"
+  private onEscapeConfirmed?: (() => void) | undefined
   EscapeConfirmWindow: EscapeConfirmWindow
 
-  constructor(characters: createCharacter[], window: CommandWindow, bgVideo: HTMLVideoElement) {
+  constructor(
+    characters: createCharacter[], 
+    window: CommandWindow, 
+    bgVideo: HTMLVideoElement, 
+    callbacks?:{ onEscapeConfirmed?: () => void }
+  ) {
     this.characters = characters
     this.window = window
     this.bgVideo = bgVideo
 
-    this.window.onRequestEscape = () => {
-      this.showEscapeConfirm()
-    }
+    this.onEscapeConfirmed = callbacks?.onEscapeConfirmed
 
     this.EscapeConfirmWindow = new EscapeConfirmWindow(
       {x:0 , y: 0},
       {x: 100, y: 100},
       undefined
     )
+    this.EscapeConfirmWindow.visible = false
 
     this.EscapeConfirmWindow.onConfirm = (yes) => {
       if (yes) {
-        this.showEscapeConfirm?.()
+        this.onEscapeConfirmed?.()
       } else {
         this.closeEscapeConfirm()
       }
@@ -42,21 +47,33 @@ export class BattleScene {
     }
   }
 
-  handleInput(action: BattleCommand) {
-    if (this.mode === 'command') {
-      this.window.handleInput(action)
+  handleInput(action: string) {
+    console.log(action, this.mode)
+    if (action === "escape"){
+      this.showEscapeConfirm()
+      // this.EscapeConfirmWindow.handleInput(action)
       return
     }
-  }
-  handleEscape(action: BattleCommand){
-    if (this.mode === 'escape') {
-      this.EscapeConfirmWindow.handleInput(action)
+
+    if (action === "confirm" && this.EscapeConfirmWindow.selectedIndex=== 0){
+      this.onEscapeConfirmed?.()
     }
+    if (action === "confirm" && this.EscapeConfirmWindow.selectedIndex=== 1){
+      this.closeEscapeConfirm()
+    }
+
+    if (this.EscapeConfirmWindow.visible == true) {
+      this.EscapeConfirmWindow.handleInput(action)
+      return
+    }
+
+    this.window.handleInput(action)
   }
 
   showEscapeConfirm() {
     this.mode = 'escape'
     this.EscapeConfirmWindow.visible = true
+    this.EscapeConfirmWindow.selectedIndex = 0
   }
 
   closeEscapeConfirm() {
