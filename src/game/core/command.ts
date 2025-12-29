@@ -1,6 +1,5 @@
 import { CreateObject } from '../core/objectModels'
 import type { Vec2 } from '../core/types'
-import type { BattleCommand } from '../core/types'
 
 export class Commands extends CreateObject {
   constructor(

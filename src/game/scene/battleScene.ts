@@ -94,8 +94,8 @@ export class BattleScene {
     ctx.save()
 
     this.camera.apply(ctx)
-    ctx.strokeStyle = 'red'
-    ctx.strokeRect(-5, -5, 10, 10) // ワールド原点
+    // ctx.strokeStyle = 'red'
+    // ctx.strokeRect(-5, -5, 10, 10) // ワールド原点
 
     for (const c of this.characters) {
       c.draw(ctx)
